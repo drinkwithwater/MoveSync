@@ -1,0 +1,2 @@
+cd ..
+./skynet udpserver/config
