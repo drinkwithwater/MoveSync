@@ -1,0 +1,17 @@
+
+client/[Ll]ibrary/
+client/[Tt]emp/
+client/[Oo]bj/
+client/[Bb]uild/
+client/.vs
+*.csproj
+*.unityproj
+*.sln
+*.meta
+**/*.meta
+/**/*.meta
+
+*.pptx
+
+
+
