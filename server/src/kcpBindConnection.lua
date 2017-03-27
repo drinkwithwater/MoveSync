@@ -58,55 +58,52 @@ end
 
 
 
-local function ar2xy(angle,radio)
+local function ar2xy(angle,speed)
 	local piAngle=angle/180*math.pi
-	return radio*math.cos(piAngle), radio*math.sin(piAngle)
+	return speed*math.cos(piAngle), speed*math.sin(piAngle)
 end
-function KcpBindConnection:onMoveOper(dir)
-	self.moveOper=dir
+
+-- when recv message
+function KcpBindConnection:onMoveAction(dir)
+	self.moveAction=dir
+	-- init
 	if not self.startMove then
 		self.startMove=true
-		self.lastUpdateTime=skynet.time()
 		self.frame=0
-		self.dir=dir
+		self.dir={
+			angle=0,
+			speed=0,
+		}
 		self.pos={
 			x=0,
 			y=0
 		}
 	end
 end
--- for NetworkMoveProject
-function KcpBindConnection:doMoveOper()
-	local dir=self.moveOper
-	if not dir then
+
+-- called each frame (per 200 ms)
+function KcpBindConnection:processMoveAction()
+	if not self.moveAction then
 		return
 	else
-		self.dir=dir
-		self.moveOper=nil
+		self.dir=self.moveAction
+		self.moveAction=nil
 	end
-	--[[
-	local dt=(skynet.time()-self.lastUpdateTime)
-	local dx,dy=ar2xy(self.dir.angle, dt*self.dir.radio)
-	self.pos.x = self.pos.x + dx
-	self.pos.y = self.pos.y + dy
-	self.dir=dir
-	local sendMsg=sendFormat:format(self.frame+dt, self.pos.x, self.pos.y, self.dir.angle, self.dir.radio)
-	self:doSend(string.pack(">s2",sendMsg))]]
 end
 
-sendFormat="%f %f %f %d %d" -- frame pos.x pos.y dir.x dir.y
--- for NetworkMoveProject
+sendFormat="%f %f %f %d %d" -- frame pos.x pos.y dir.angle dir.speed
+-- frame update
 function KcpBindConnection:onUpdateFrame()
-	self.lastUpdateTime=skynet.time()
-	if self.startMove then
-		self.frame = self.frame + 1
-		local dx,dy=ar2xy(self.dir.angle, self.dir.radio)
-		self.pos.x = self.pos.x + dx
-		self.pos.y = self.pos.y + dy
-		self:doMoveOper()
-		local sendMsg=sendFormat:format(self.frame, self.pos.x, self.pos.y, self.dir.angle, self.dir.radio)
-		self:doSend(string.pack(">s2",sendMsg))
+	if not self.startMove then
+		return
 	end
+	self.frame=self.frame+1
+	local dx,dy=ar2xy(self.dir.angle, self.dir.speed)
+	self.pos.x = self.pos.x + dx
+	self.pos.y = self.pos.y + dy
+	self:processMoveAction()
+	local sendMsg=sendFormat:format(self.frame, self.pos.x, self.pos.y, self.dir.angle, self.dir.speed)
+	self:doSend(string.pack(">s2",sendMsg))
 end
 
 -- [public], update for send
@@ -322,10 +319,10 @@ function KcpBindConnection:dispatchMessage(vMsg)
 		local angle=tonumber(vMsg)
 		if angle>=0 then
 			local speed=6
-			self:onMoveOper({angle=angle,radio=speed})
+			self:onMoveAction({angle=angle,speed=speed})
 		else
 			local speed=0
-			self:onMoveOper({angle=angle,radio=0})
+			self:onMoveAction({angle=angle,speed=0})
 		end
 		print("receive:",vMsg,#vMsg)
 		-- self:doSend(string.pack(">H",2)..vMsg)

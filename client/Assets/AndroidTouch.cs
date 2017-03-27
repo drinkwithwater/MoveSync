@@ -9,10 +9,10 @@ using System.Collections.Generic;
 
 class AngleDirect {
     public int angle;
-    public int radio;
+    public int speed;
     public AngleDirect(int a,int b) {
         angle = a;
-        radio = b;
+        speed = b;
     }
 }
 
@@ -54,7 +54,7 @@ class Oper{
 
     void toggleIn(float x, float y) {
         center.x = x;
-        center.y = y; 
+        center.y = y;
         toggle = true;
         item.showPanel(x, y);
     }
@@ -115,8 +115,9 @@ public class AndroidTouch : MonoBehaviour {
 
         kcpSocket.Init("166.111.132.72", 8888, (Action<List<byte[]>,int>)((List<byte[]> a,int b)=> {
             for (int i = 0; i < a.Count; i++) {
-                string temp=System.Text.Encoding.Default.GetString(a[i]);
-                string [] fposdir=temp.Split();
+				// deal message( sendFormat="%f %f %f %d %d" -- frame pos.x pos.y dir.angle dir.speed )
+                string msg=System.Text.Encoding.Default.GetString(a[i]);
+                string [] fposdir=msg.Split();
                 float x = float.Parse(fposdir[1]);
                 float y = float.Parse(fposdir[2]);
 
@@ -135,7 +136,7 @@ public class AndroidTouch : MonoBehaviour {
                 }
 
                 dir.angle = int.Parse(fposdir[3]);
-                dir.radio = int.Parse(fposdir[4]);
+                dir.speed = int.Parse(fposdir[4]);
                 cube.rotation = Quaternion.Euler(0, 0, dir.angle);
             }
         }));
@@ -166,7 +167,7 @@ public class AndroidTouch : MonoBehaviour {
         send(""+angle);
         touchPanel.rotation = Quaternion.Euler(0, 0, angle);
     }
-	
+
 	// Update is called once per frame
 	void Update () {
         if (useMouse) {
@@ -185,6 +186,7 @@ public class AndroidTouch : MonoBehaviour {
 
         uint cur = TimeHelper.GetMilliseconds();
         if (cur - lastFrameTime > 200) {
+			// deal input
             oper.frameUpdate();
             lastFrameTime += 200;
             frame++;
@@ -192,12 +194,12 @@ public class AndroidTouch : MonoBehaviour {
 
         int dt = (int)(cur - lastUpdateTime);
         lastUpdateTime = cur;
-        if (dir.radio == 0) {
+        if (dir.speed == 0) {
             return;
         } else {
             double dirAngle = 1.0 * dir.angle / 180 * Math.PI;
-            double dirX = dir.radio*Math.Cos(dirAngle);
-            double dirY = dir.radio*Math.Sin(dirAngle);
+            double dirX = dir.speed*Math.Cos(dirAngle);
+            double dirY = dir.speed*Math.Sin(dirAngle);
             double dx = dirX * dt / 200;
             double dy = dirY * dt / 200;
             setPosition((float)(self.position.x + dx), (float)(self.position.y + dy));
