@@ -3,9 +3,10 @@
 client: unity
 
 server: skynet
-		cp -r server skynet/sth
-		cd sth
-		./run.sh
+
+	cp -r server skynet/sth
+	cd sth
+	./run.sh
 
 
 ## Main Logic:
