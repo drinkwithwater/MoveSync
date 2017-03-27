@@ -84,9 +84,11 @@ class Oper{
 
 public class AndroidTouch : MonoBehaviour {
 
+    public int SERVER_FRAME_MILLISECONDS = 200;
+    public string ip = "166.111.132.72";
     public Transform cube = null;
     public Transform touchPanel = null;
-    public bool useMouse = false;
+    public bool useMouse = true;
 
     private uint lastUpdateTime = TimeHelper.GetMilliseconds();
 
@@ -113,7 +115,7 @@ public class AndroidTouch : MonoBehaviour {
         selfCamera = GetComponent<Camera>();
         kcpSocket = GetComponent<KcpSocket>();
 
-        kcpSocket.Init("166.111.132.72", 8888, (Action<List<byte[]>,int>)((List<byte[]> a,int b)=> {
+        kcpSocket.Init(ip, 8888, (Action<List<byte[]>,int>)((List<byte[]> a,int b)=> {
             for (int i = 0; i < a.Count; i++) {
 				// deal message( sendFormat="%f %f %f %d %d" -- frame pos.x pos.y dir.angle dir.speed )
                 string msg=System.Text.Encoding.Default.GetString(a[i]);
@@ -185,10 +187,10 @@ public class AndroidTouch : MonoBehaviour {
         }
 
         uint cur = TimeHelper.GetMilliseconds();
-        if (cur - lastFrameTime > 200) {
+        if (cur - lastFrameTime > SERVER_FRAME_MILLISECONDS) {
 			// deal input
             oper.frameUpdate();
-            lastFrameTime += 200;
+            lastFrameTime += (uint)SERVER_FRAME_MILLISECONDS;
             frame++;
         }
 
@@ -200,8 +202,8 @@ public class AndroidTouch : MonoBehaviour {
             double dirAngle = 1.0 * dir.angle / 180 * Math.PI;
             double dirX = dir.speed*Math.Cos(dirAngle);
             double dirY = dir.speed*Math.Sin(dirAngle);
-            double dx = dirX * dt / 200;
-            double dy = dirY * dt / 200;
+            double dx = dirX * dt / SERVER_FRAME_MILLISECONDS;
+            double dy = dirY * dt / SERVER_FRAME_MILLISECONDS;
             setPosition((float)(self.position.x + dx), (float)(self.position.y + dy));
             if (toleranceFrame > 0) {
                 float tolx = (float)(toleranceX / toleranceFrame);

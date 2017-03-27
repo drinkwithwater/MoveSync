@@ -2,10 +2,14 @@
 
 client: unity
 
+	1. import in unity
+	2. set server ip in AndroidTouch component
+
 server: skynet
 
-	cp -r server skynet/sth
-	cd sth
+	cp -r server skynet/udpserver
+	cd udpserver
+	chmod +x run.sh
 	./run.sh
 
 
@@ -13,7 +17,7 @@ server: skynet
 
 client to server:
 
-	angle speed
+	angle
 
 server to client:
 
@@ -140,8 +144,8 @@ server to client:
 				double dirAngle = 1.0 * dir.angle / 180 * Math.PI;
 				double dirX = dir.speed*Math.Cos(dirAngle);
 				double dirY = dir.speed*Math.Sin(dirAngle);
-				double dx = dirX * dt / 200;
-				double dy = dirY * dt / 200;
+				double dx = dirX * dt / SERVER_FRAME_MILLISECONDS;
+				double dy = dirY * dt / SERVER_FRAME_MILLISECONDS;
 				setPosition((float)(self.position.x + dx), (float)(self.position.y + dy));
 				if (toleranceFrame > 0) {
 					float tolx = (float)(toleranceX / toleranceFrame);
