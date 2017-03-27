@@ -8,7 +8,7 @@ client: unity
 server: skynet
 
 	cp -r server skynet/udpserver
-	cd udpserver
+	cd skynet/udpserver
 	chmod +x run.sh
 	./run.sh
 
