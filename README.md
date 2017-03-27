@@ -13,6 +13,7 @@ server: skynet
 ### server:
 
 [server/moveUdpServer.lua:](server/moveUdpServer.lua)
+
 		skynet.fork(function()
 			while(true) do
 				for nFd, nConn in pairs(mFdToConn) do
@@ -90,6 +91,7 @@ server: skynet
 ### client:
 
 [client/Assets/Android.cs:](client/Assets/AndroidTouch.cs)
+
 		// deal message( sendFormat="%f %f %f %d %d" -- frame pos.x pos.y dir.angle dir.speed )
 		{
 			string msg=System.Text.Encoding.Default.GetString(a[i]);
