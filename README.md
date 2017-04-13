@@ -1,9 +1,13 @@
+## Mechanism
+
+[wiki(Only Chinese...)](https://github.com/drinkwithwater/MoveSync/wiki)
+
 ## Enviroment
 
 client: unity
 
-	1. import in unity
-	2. set server ip in AndroidTouch component
+	import in unity
+	set server ip in AndroidTouch component of MainCamera Node.
 
 server: skynet
 
@@ -12,18 +16,3 @@ server: skynet
 	chmod +x run.sh
 	./run.sh
 
-
-## Message
-
-client to server:
-
-	angle
-
-server to client:
-
-	frame pos.x pos.y angle speed
-
-
-## Mechanism
-
-[wiki(Only Chinese...)](https://github.com/drinkwithwater/MoveSync/wiki)

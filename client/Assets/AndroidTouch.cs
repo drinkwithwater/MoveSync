@@ -96,9 +96,9 @@ public class AndroidTouch : MonoBehaviour {
     private int frame= 0;
     private AngleDirect dir = new AngleDirect(0, 0);
 
-    private double toleranceX = 0.0;
-    private double toleranceY = 0.0;
-    private int toleranceFrame = 64;
+    private double offsetX = 0.0;
+    private double offsetY = 0.0;
+    private int fakeFrame = 120;
 
     private Transform self = null;
     private Camera selfCamera = null;
@@ -129,13 +129,9 @@ public class AndroidTouch : MonoBehaviour {
                 if (delta > 0.1) {
                     Debug.Log("delta=" + delta);
                 }
-                if (delta > 3) {
-                    setPosition(x, y);
-                } else {
-                    toleranceX = deltaX;
-                    toleranceY = deltaY;
-                    toleranceFrame = 64;
-                }
+                offsetX = deltaX;
+                offsetY = deltaY;
+                fakeFrame = 120;
 
                 dir.angle = int.Parse(fposdir[3]);
                 dir.speed = int.Parse(fposdir[4]);
@@ -204,12 +200,13 @@ public class AndroidTouch : MonoBehaviour {
             double dirY = dir.speed*Math.Sin(dirAngle);
             double dx = dirX * dt / SERVER_FRAME_MILLISECONDS;
             double dy = dirY * dt / SERVER_FRAME_MILLISECONDS;
-            setPosition((float)(self.position.x + dx), (float)(self.position.y + dy));
-            if (toleranceFrame > 0) {
-                float tolx = (float)(toleranceX / toleranceFrame);
-                float toly = (float)(toleranceY / toleranceFrame);
-                setPosition((float)(self.position.x + tolx), (float)(self.position.y + toly));
-                toleranceFrame--;
+            if (fakeFrame > 0) {
+                float tolx = (float)(offsetX / 120);
+                float toly = (float)(offsetY / 120);
+                setPosition((float)(self.position.x + dx + tolx), (float)(self.position.y + dy + toly));
+                fakeFrame--;
+            } else {
+                setPosition((float)(self.position.x + dx), (float)(self.position.y + dy));
             }
         }
     }
